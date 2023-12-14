@@ -3,8 +3,6 @@ package org.example;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.DriverManager;
 import java.util.ArrayList;
 
 public class Main{
@@ -12,7 +10,11 @@ public class Main{
     BufferedReader buff;
     int selectedOption;
 
+    dbUtils db = new dbUtils();
     Library lb = new Library();
+
+
+    boolean flag = true;
     public Main(){
         if(str == null){
             str = new InputStreamReader(System.in);
@@ -22,21 +24,11 @@ public class Main{
         }
     }
     public static void main(String args[]){
-        String url = System.getenv("dbUrl");
-        String pass = System.getenv("dbPass");
-        String user = System.getenv("dbUser");
-        try{
-            Connection connection = DriverManager.getConnection(url,user,pass);
-            System.out.println("Connected");
-            //set and get data from database.
-            connection.close();
-        }
-        catch (Exception e){
-            System.out.println(e);
-        }
+
         Main obj = new Main();
-        while(true) {
-            System.out.print("Welcome to White House Library!\nPlease Select:\n1. Add Book\n2. Find Book\n3. Update Book\n4. Delete Book\n");
+        obj.db.connect();
+        while(obj.flag) {
+            System.out.print("Welcome to White House Library!\nPlease Select:\n1. Add Book\n2. Find Book\n3. Update Book\n4. Delete Book\n5. Exit\n");
             try {
                 obj.selectedOption = Integer.parseInt(obj.buff.readLine());
             } catch (IOException e) {
@@ -44,6 +36,7 @@ public class Main{
             }
             obj.Option();
         }
+        obj.db.disconnect();
     }
 
     //Input method
@@ -77,8 +70,7 @@ public class Main{
     public void Option(){
         switch (selectedOption){
             case 1:
-                String name, author, category;
-                float price;
+                String name, author, category, price;
                 System.out.println("Enter book name ");
                 name = getInput();
                 System.out.println("Enter book author's name ");
@@ -86,9 +78,9 @@ public class Main{
                 System.out.println("Enter book category ");
                 category = getInput();
                 System.out.println("Enter book price ");
-                price = Float.parseFloat(getInput());
+                price = getInput();
 
-                lb.addBook(name, author, category, price);
+                lb.addBook(name, author, category, price, db.connection);
                 System.out.println("Book Added Sucessfully!");
                 break;
             case 2:
@@ -101,6 +93,7 @@ public class Main{
                 deleteOptions();
                 break;
             case 5:
+                flag = false;
                 break;
             default:
                 System.out.print("Invalid Input!");
@@ -114,19 +107,19 @@ public class Main{
         switch(x){
             case 1:
                 System.out.println("Enter name ");
-                printArrayList(lb.findByName(getInput()));
+                printArrayList(lb.find(getInput(), "bookName", db.connection));
                 break;
             case 2:
                 System.out.println("Enter author's name ");
-                printArrayList(lb.findByAuthor(getInput()));
+                printArrayList(lb.find(getInput(), "bookAuthor", db.connection));
                 break;
             case 3:
                 System.out.println("Enter book category ");
-                printArrayList(lb.findByCategory(getInput()));
+                printArrayList(lb.find(getInput(), "bookCategory", db.connection));
                 break;
             case 4:
                 System.out.println("Enter book price ");
-                printArrayList(lb.findByprice(Float.parseFloat(getInput())));
+                printArrayList(lb.find(getInput(), "bookPrice", db.connection));
                 break;
             default:
                 System.out.print("Invalid Input!");
@@ -141,7 +134,7 @@ public class Main{
         switch(x){
             case 1:
                 System.out.println("Enter name ");
-                ArrayList<Book> filteredBook1 = lb.findByName(getInput());
+                ArrayList<Book> filteredBook1 = lb.find(getInput(), "bookName",db.connection);
                 if(!filteredBook1.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook1);
@@ -152,7 +145,7 @@ public class Main{
                 break;
             case 2:
                 System.out.println("Enter author's name ");
-                ArrayList<Book> filteredBook2 = lb.findByAuthor(getInput());
+                ArrayList<Book> filteredBook2 = lb.find(getInput(), "bookauthor",db.connection);
                 if(!filteredBook2.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook2);
@@ -163,7 +156,7 @@ public class Main{
                 break;
             case 3:
                 System.out.println("Enter book category ");
-                ArrayList<Book> filteredBook3 = lb.findByCategory(getInput());
+                ArrayList<Book> filteredBook3 = lb.find(getInput(), "bookCategory",db.connection);
                 if(!filteredBook3.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook3);
@@ -174,7 +167,7 @@ public class Main{
                 break;
             case 4:
                 System.out.println("Enter book price ");
-                ArrayList<Book> filteredBook4 = lb.findByprice(Float.parseFloat(getInput()));
+                ArrayList<Book> filteredBook4 = lb.find(getInput(), "bookPrice",db.connection);
                 if(!filteredBook4.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook4);
@@ -195,28 +188,28 @@ public class Main{
             case 1:
                 System.out.println("Enter name: ");
                 String name = getInput();
-                lb.updateName(b, name);
+                lb.update(b, "bookName", name, db.connection);
                 System.out.println("Updated successfully!");
                 printObj(b);
                 break;
             case 2:
                 System.out.println("Enter author's name: ");
                 String authorName = getInput();
-                lb.updateAuthor(b, authorName);
+                lb.update(b, "bookAuthor", authorName, db.connection);
                 System.out.println("Updated successfully!");
                 printObj(b);
                 break;
             case 3:
                 System.out.println("Enter category: ");
                 String category = getInput();
-                lb.updateCategory(b, category);
+                lb.update(b, "bookCategory", category, db.connection);
                 System.out.println("Updated successfully!");
                 printObj(b);
                 break;
             case 4:
                 System.out.println("Enter price: ");
-                float price = Float.parseFloat(getInput());
-                lb.updatePrice(b, price);
+                String price = getInput();
+                lb.update(b, "bookPrice", price, db.connection);
                 System.out.println("Updated successfully!");
                 printObj(b);
                 break;
@@ -232,7 +225,7 @@ public class Main{
         switch(x){
             case 1:
                 System.out.println("Enter name ");
-                ArrayList<Book> filteredBook1 = lb.findByName(getInput());
+                ArrayList<Book> filteredBook1 = lb.find(getInput(), "bookName",db.connection);
                 if(!filteredBook1.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook1);
@@ -244,7 +237,7 @@ public class Main{
                 break;
             case 2:
                 System.out.println("Enter author's name ");
-                ArrayList<Book> filteredBook2 = lb.findByAuthor(getInput());
+                ArrayList<Book> filteredBook2 = lb.find(getInput(), "bookAuthor",db.connection);
                 if(!filteredBook2.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook2);
@@ -256,7 +249,7 @@ public class Main{
                 break;
             case 3:
                 System.out.println("Enter book category ");
-                ArrayList<Book> filteredBook3 = lb.findByCategory(getInput());
+                ArrayList<Book> filteredBook3 = lb.find(getInput(), "bookCategory",db.connection);
                 if(!filteredBook3.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook3);
@@ -268,7 +261,7 @@ public class Main{
                 break;
             case 4:
                 System.out.println("Enter book price ");
-                ArrayList<Book> filteredBook4 = lb.findByprice(Float.parseFloat(getInput()));
+                ArrayList<Book> filteredBook4 = lb.find(getInput(), "bookPrice",db.connection);
                 if(!filteredBook4.isEmpty()) {
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook4);
