@@ -220,7 +220,7 @@ public class Main{
 
     //delete options
     public void deleteOptions(){
-        System.out.print("Select update method\n1. Find by book name and delete\n2. Find by author's name and delete\n3. Find by category and delete\n4. Find by price and delete\n");
+        System.out.print("Select delete method\n1. Find by book name and delete\n2. Find by author's name and delete\n3. Find by category and delete\n4. Find by price and delete\n");
         int x = Integer.parseInt(getInput());
         switch(x){
             case 1:
@@ -230,7 +230,7 @@ public class Main{
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook1);
                     int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook1.get(y-1));
+                    lb.delete(filteredBook1.get(y-1), db.connection);
                     System.out.println("Deleted Successfully!");
                 }
                 else System.out.println("Oops! No books found.");
@@ -242,7 +242,7 @@ public class Main{
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook2);
                         int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook2.get(y-1));
+                    lb.delete(filteredBook2.get(y-1), db.connection);
                     System.out.println("Deleted Successfully!");
                 }
                 else System.out.println("Oops! No books found.");
@@ -254,7 +254,7 @@ public class Main{
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook3);
                     int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook3.get(y-1));
+                    lb.delete(filteredBook3.get(y-1), db.connection);
                     System.out.println("Deleted Successfully!");
                 }
                 else System.out.println("Oops! No books found.");
@@ -266,7 +266,7 @@ public class Main{
                     System.out.print("Select Book\n");
                     printArrayList(filteredBook4);
                     int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook4.get(y-1));
+                    lb.delete(filteredBook4.get(y-1), db.connection);
                     System.out.println("Deleted Successfully!");
                 }
                 else System.out.println("Oops! No books found.");

@@ -11,5 +11,5 @@ public interface Stock{
     public ArrayList<Book> getHeighest();
     public void getByPriceRange();
     public void update(Book b, String prop, String name, Connection connection);
-    public void delete(Book b);
+    public void delete(Book b, Connection connection);
 }

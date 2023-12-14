@@ -110,7 +110,13 @@ public class Library implements Stock {
 
 
     @Override
-    public void delete(Book b) {
-        bookList.remove(b);
+    public void delete(Book b, Connection connection) {
+        try {
+            Statement stmt = connection.createStatement();
+//            System.out.println("update books set " + prop + "='"+ name+"' where id="+b.id);
+            stmt.executeUpdate("delete from books where id="+b.id);
+        }catch(Exception e){
+            System.out.println(e);
+        }
     }
 }
