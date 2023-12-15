@@ -47,6 +47,6 @@ public class Book{
     public String getPrice(){
         if(!bookName.equals(null) || !bookName.equals("")) return this.price;
         else
-            return "NA";
+            return "0f";
     }
 }

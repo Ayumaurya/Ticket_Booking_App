@@ -11,7 +11,7 @@ public class dbUtils {
         String user = System.getenv("dbUser");
         try {
             connection = DriverManager.getConnection(url, user, pass);
-            System.out.println("Connected");
+            System.out.println("Database Connected Successfully!");
         } catch (Exception e) {
             System.out.println(e);
         }
@@ -19,7 +19,7 @@ public class dbUtils {
     public void disconnect(){
         try {
             connection.close();
-            System.out.println("Disconnected!");
+            System.out.println("Database Disconnected!");
         } catch (Exception e) {
             System.out.println(e);
         }

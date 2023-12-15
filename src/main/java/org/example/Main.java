@@ -27,16 +27,20 @@ public class Main{
 
         Main obj = new Main();
         obj.db.connect();
-        while(obj.flag) {
+        obj.startApp();
+        obj.db.disconnect();
+    }
+    //Start App
+    public void startApp(){
+        while(flag) {
             System.out.print("Welcome to White House Library!\nPlease Select:\n1. Add Book\n2. Find Book\n3. Update Book\n4. Delete Book\n5. Exit\n");
             try {
-                obj.selectedOption = Integer.parseInt(obj.buff.readLine());
+                selectedOption = Integer.parseInt(buff.readLine());
             } catch (IOException e) {
                 e.printStackTrace();
             }
-            obj.Option();
+            Option();
         }
-        obj.db.disconnect();
     }
 
     //Input method
@@ -102,7 +106,7 @@ public class Main{
 
     //find methods
     public void findOptions(){
-        System.out.print("Select find method\n1. Find by book name\n2. Find by author's name\n3. Find by category\n4. Find by price\n");
+        System.out.print("Select find method\n1. Find by book name\n2. Find by author's name\n3. Find by category\n4. Find by price\n5. Find Costliest\n6. Find Cheapest\n7. Find in range\n8. Find by publish year\n9. Exit\n");
         int x = Integer.parseInt(getInput());
         switch(x){
             case 1:
@@ -121,11 +125,34 @@ public class Main{
                 System.out.println("Enter book price ");
                 printArrayList(lb.find(getInput(), "bookPrice", db.connection));
                 break;
+            case 5:
+                printArrayList(lb.getCostliest(db.connection));
+                break;
+            case 6:
+                printArrayList(lb.getCheapest(db.connection));
+                break;
+            case 7:
+                printArrayList(getInRange());
+                break;
+            case 8:
+                System.out.println("Implementation in progress!!");
+                break;
+            case 9:
+                startApp();
             default:
                 System.out.print("Invalid Input!");
         }
     }
 
+
+    //Get in range
+    public ArrayList getInRange(){
+        System.out.println("Enter min price");
+        Float min = Float.parseFloat(getInput());
+        System.out.println("Enter min price");
+        Float max = Float.parseFloat(getInput());
+        return lb.getByPriceRange(min, max, db.connection);
+    }
 
     //Update options
     public void updateOptions() {
@@ -181,98 +208,71 @@ public class Main{
         }
     }
     //properties to update
-    public void propToUpdate(Book b){
-        System.out.println("Select property to update.\n1. Book name\n2. Author's name\n3. Book Category\n4. Price\n");
-        int x = Integer.parseInt(getInput());
-        switch (x){
-            case 1:
-                System.out.println("Enter name: ");
-                String name = getInput();
-                lb.update(b, "bookName", name, db.connection);
-                System.out.println("Updated successfully!");
-                printObj(b);
-                break;
-            case 2:
-                System.out.println("Enter author's name: ");
-                String authorName = getInput();
-                lb.update(b, "bookAuthor", authorName, db.connection);
-                System.out.println("Updated successfully!");
-                printObj(b);
-                break;
-            case 3:
-                System.out.println("Enter category: ");
-                String category = getInput();
-                lb.update(b, "bookCategory", category, db.connection);
-                System.out.println("Updated successfully!");
-                printObj(b);
-                break;
-            case 4:
-                System.out.println("Enter price: ");
-                String price = getInput();
-                lb.update(b, "bookPrice", price, db.connection);
-                System.out.println("Updated successfully!");
-                printObj(b);
-                break;
-            default:
-                System.out.println("Invalid Input!");
+    public void propToUpdate(Book b) {
+        System.out.println("Update book name (y/n)");
+        if (getInput().toLowerCase().equals("y")) {
+            System.out.println("enter book name");
+            b.bookName = getInput().toLowerCase();
         }
+        System.out.println("Update book author (y/n)");
+        if (getInput().toLowerCase().equals("y")) {
+            System.out.println("enter book author");
+            b.bookAuthor = getInput().toLowerCase();
+        }
+        System.out.println("Update book category (y/n)");
+        if (getInput().toLowerCase().equals("y")) {
+            System.out.println("enter book category");
+            b.bookCategory = getInput().toLowerCase();
+        }
+        System.out.println("Update book price (y/n)");
+        if (getInput().toLowerCase().equals("y")) {
+            System.out.println("enter price");
+            b.price = getInput();
+        }
+
+        lb.update(b, db.connection);
+        System.out.println("Updated Successfully!");
+        printObj(b);
     }
 
     //delete options
     public void deleteOptions(){
-        System.out.print("Select delete method\n1. Find by book name and delete\n2. Find by author's name and delete\n3. Find by category and delete\n4. Find by price and delete\n");
+        System.out.print("Select delete method\n1. Find by book name and delete\n2. Find by author's name and delete\n3. Find by category and delete\n4. Find by price and delete\n5. Exit\n");
         int x = Integer.parseInt(getInput());
         switch(x){
             case 1:
                 System.out.println("Enter name ");
-                ArrayList<Book> filteredBook1 = lb.find(getInput(), "bookName",db.connection);
-                if(!filteredBook1.isEmpty()) {
-                    System.out.print("Select Book\n");
-                    printArrayList(filteredBook1);
-                    int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook1.get(y-1), db.connection);
-                    System.out.println("Deleted Successfully!");
-                }
-                else System.out.println("Oops! No books found.");
+                delete("bookName");
                 break;
             case 2:
                 System.out.println("Enter author's name ");
-                ArrayList<Book> filteredBook2 = lb.find(getInput(), "bookAuthor",db.connection);
-                if(!filteredBook2.isEmpty()) {
-                    System.out.print("Select Book\n");
-                    printArrayList(filteredBook2);
-                        int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook2.get(y-1), db.connection);
-                    System.out.println("Deleted Successfully!");
-                }
-                else System.out.println("Oops! No books found.");
+                delete("bookAuthor");
                 break;
             case 3:
                 System.out.println("Enter book category ");
-                ArrayList<Book> filteredBook3 = lb.find(getInput(), "bookCategory",db.connection);
-                if(!filteredBook3.isEmpty()) {
-                    System.out.print("Select Book\n");
-                    printArrayList(filteredBook3);
-                    int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook3.get(y-1), db.connection);
-                    System.out.println("Deleted Successfully!");
-                }
-                else System.out.println("Oops! No books found.");
+                delete("bookCategory");
                 break;
             case 4:
                 System.out.println("Enter book price ");
-                ArrayList<Book> filteredBook4 = lb.find(getInput(), "bookPrice",db.connection);
-                if(!filteredBook4.isEmpty()) {
-                    System.out.print("Select Book\n");
-                    printArrayList(filteredBook4);
-                    int y = Integer.parseInt(getInput());
-                    lb.delete(filteredBook4.get(y-1), db.connection);
-                    System.out.println("Deleted Successfully!");
-                }
-                else System.out.println("Oops! No books found.");
+                delete("bookPrice");
+                break;
+            case 5:
+                startApp();
                 break;
             default:
                 System.out.print("Invalid Input!");
         }
+    }
+    // delete
+    public void delete(String props){
+        ArrayList<Book> filteredBook = lb.find(getInput(), props,db.connection);
+        if(!filteredBook.isEmpty()) {
+            System.out.print("Select Book\n");
+            printArrayList(filteredBook);
+            int y = Integer.parseInt(getInput());
+            lb.delete(filteredBook.get(y-1), db.connection);
+            System.out.println("Deleted Successfully!");
+        }
+        else System.out.println("Oops! No books found.");
     }
 }
