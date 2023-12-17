@@ -16,14 +16,15 @@ public class Library implements Stock {
 
 
     @Override
-    public void addBook(String name, String author, String category, String price, Connection connection) {
-        Book b = new Book(name.toLowerCase(), price, category.toLowerCase(), author.toLowerCase());
+    public void addBook(String name, String author, String category, String price, String year,Connection connection) {
+        Book b = new Book(name.toLowerCase(), price, category.toLowerCase(), author.toLowerCase(), year);
         try {
-            PreparedStatement pStmt = connection.prepareStatement("insert into books (bookName, bookCategory, bookAuthor, bookPrice) values (?,?,?,?)");
+            PreparedStatement pStmt = connection.prepareStatement("insert into books (bookName, bookCategory, bookAuthor, bookPrice, bookPublished) values (?,?,?,?,?)");
             pStmt.setString(1, b.getName());
             pStmt.setString(2, b.getCategory());
             pStmt.setString(3, b.getAuthorName());
             pStmt.setFloat(4, Float.parseFloat(b.getPrice()));
+            pStmt.setFloat(5, Integer.parseInt(b.getYear()));
             // METHOD FOR EXECUTING THE SQL QUERY
             pStmt.executeUpdate();//Adding new to library
         }catch(Exception e){
@@ -39,8 +40,9 @@ public class Library implements Stock {
             Statement stmt = connection.createStatement();
             if(prop.equals("bookPrice"))
             rs = stmt.executeQuery("select * from books where "+prop+"='"+Float.parseFloat(name)+"'");
+            else if(prop.equals("bookPrice")) rs = stmt.executeQuery("select * from books where "+prop+"='"+Integer.parseInt(name)+"'");
             else
-                System.out.println("select * from books where "+prop+" like '%"+name.toLowerCase()+"%'");
+                //System.out.println("select * from books where "+prop+" like '%"+name.toLowerCase()+"%'");
                 rs = stmt.executeQuery("select * from books where "+prop+" like '%"+name.toLowerCase()+"%'");
             while(rs.next()) {
                 Book book1 = new Book();
@@ -139,6 +141,15 @@ public class Library implements Stock {
             Statement stmt = connection.createStatement();
 //            System.out.println("update books set " + prop + "='"+ name+"' where id="+b.id);
             stmt.executeUpdate("delete from books where id="+b.id);
+        }catch(Exception e){
+            System.out.println(e);
+        }
+    }
+    public void deleteAll() {
+        try {
+            Statement stmt = dbUtils.connect().createStatement();
+//            System.out.println("update books set " + prop + "='"+ name+"' where id="+b.id);
+            stmt.executeUpdate("delete from books");
         }catch(Exception e){
             System.out.println(e);
         }

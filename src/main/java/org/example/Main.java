@@ -60,7 +60,7 @@ public class Main{
         if(b.size() == 0) System.out.println("Oops! No books found");
         else {
             for (int i = 0; i < b.size(); i++) {
-                System.out.print(Integer.toString(i+1)+".\n{\nBook name: " + b.get(i).bookName + "\nBook Author: " + b.get(i).bookAuthor + "\nBook Price: " + b.get(i).price + "\n}\n");
+                System.out.print(Integer.toString(i+1)+". [\n      Book name: " + b.get(i).bookName + "\n      Book Author: " + b.get(i).bookAuthor + "\n      Book Price: " + b.get(i).price + "\n   ]\n");
             }
         }
     }
@@ -74,7 +74,7 @@ public class Main{
     public void Option(){
         switch (selectedOption){
             case 1:
-                String name, author, category, price;
+                String name, author, category, price, year;
                 System.out.println("Enter book name ");
                 name = getInput();
                 System.out.println("Enter book author's name ");
@@ -83,8 +83,10 @@ public class Main{
                 category = getInput();
                 System.out.println("Enter book price ");
                 price = getInput();
+                System.out.println("Enter book publish year ");
+                year = getInput();
 
-                lb.addBook(name, author, category, price, db.connection);
+                lb.addBook(name, author, category, price, year, dbUtils.connect());
                 System.out.println("Book Added Sucessfully!");
                 break;
             case 2:
@@ -135,7 +137,8 @@ public class Main{
                 printArrayList(getInRange());
                 break;
             case 8:
-                System.out.println("Implementation in progress!!");
+                System.out.println("Enter publish year ");
+                printArrayList(lb.find(getInput(), "bookPublished", db.connection));
                 break;
             case 9:
                 startApp();
@@ -237,7 +240,7 @@ public class Main{
 
     //delete options
     public void deleteOptions(){
-        System.out.print("Select delete method\n1. Find by book name and delete\n2. Find by author's name and delete\n3. Find by category and delete\n4. Find by price and delete\n5. Exit\n");
+        System.out.print("Select delete method\n1. Find by book name and delete\n2. Find by author's name and delete\n3. Find by category and delete\n4. Find by price and delete\n5. Delete All\n6. Exit\n");
         int x = Integer.parseInt(getInput());
         switch(x){
             case 1:
@@ -257,6 +260,12 @@ public class Main{
                 delete("bookPrice");
                 break;
             case 5:
+                System.out.println("Do you really want to Delete All Data ?  (y/n)");
+                String s = getInput().toLowerCase();
+                if(s.equals("y")) delete("all");
+                else deleteOptions();
+                break;
+            case 6:
                 startApp();
                 break;
             default:
@@ -264,15 +273,20 @@ public class Main{
         }
     }
     // delete
-    public void delete(String props){
-        ArrayList<Book> filteredBook = lb.find(getInput(), props,db.connection);
-        if(!filteredBook.isEmpty()) {
-            System.out.print("Select Book\n");
-            printArrayList(filteredBook);
-            int y = Integer.parseInt(getInput());
-            lb.delete(filteredBook.get(y-1), db.connection);
-            System.out.println("Deleted Successfully!");
+    public void delete(String props) {
+        if (props == "all") {
+            lb.deleteAll();
+            System.out.println("Deleted Successfully!!");
         }
-        else System.out.println("Oops! No books found.");
+        else {
+            ArrayList<Book> filteredBook = lb.find(getInput(), props, db.connection);
+            if (!filteredBook.isEmpty()) {
+                System.out.print("Select Book\n");
+                printArrayList(filteredBook);
+                int y = Integer.parseInt(getInput());
+                lb.delete(filteredBook.get(y - 1), db.connection);
+                System.out.println("Deleted Successfully!");
+            } else System.out.println("Oops! No books found.");
+        }
     }
 }

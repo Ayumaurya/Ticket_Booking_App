@@ -4,7 +4,7 @@ import java.sql.Connection;
 import java.util.ArrayList;
 
 public interface Stock{
-    public void addBook(String name, String author, String category, String price, Connection connection);
+    public void addBook(String name, String author, String category, String price, String year,Connection connection);
     public ArrayList<Book> find(String name, String prop, Connection connection);
 
     public ArrayList<Book> getCheapest(Connection connection);

@@ -4,17 +4,19 @@ import java.sql.Connection;
 import java.sql.DriverManager;
 
 public class dbUtils {
-    Connection connection;
-    public void connect() {
+    public static Connection connection;
+    public static Connection connect() {
         String url = System.getenv("dbUrl");
         String pass = System.getenv("dbPass");
         String user = System.getenv("dbUser");
         try {
+            if(connection == null){
             connection = DriverManager.getConnection(url, user, pass);
-            System.out.println("Database Connected Successfully!");
+            System.out.println("Database Connected Successfully!");}
         } catch (Exception e) {
             System.out.println(e);
         }
+        return connection;
     }
     public void disconnect(){
         try {
